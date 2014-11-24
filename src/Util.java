@@ -26,14 +26,14 @@ public class Util {
         for (int i = 0; i < text.length; i++) {
 
             if (!maleChanceReturnMap.containsKey(text[i]) || maleChanceReturnMap.get(text[i]) == 0) {
-                chanceMale += Math.log(1 / maleChanceAmountWords);
+                chanceMale += Math.log((float)1 / maleChanceAmountWords);
             } else {
-                //chanceMale += Math.log(maleChanceReturnMap.get(text[i]));
+                chanceMale += Math.log(maleChanceReturnMap.get(text[i]));
             }
             if (!femaleChanceReturnMap.containsKey(text[i]) || femaleChanceReturnMap.get(text[i]) == 0) {
-                chanceFemale += Math.log(1 / femaleChanceAmountWords);
+                chanceFemale += Math.log((float)1 / femaleChanceAmountWords);
             } else {
-                //chanceFemale += Math.log(femaleChanceReturnMap.get(text[i]));
+                chanceFemale += Math.log(femaleChanceReturnMap.get(text[i]));
             }
         }
         System.out.println("male: " + chanceMale + " female: " + chanceFemale);
