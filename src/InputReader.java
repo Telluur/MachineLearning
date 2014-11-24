@@ -10,12 +10,9 @@ import java.util.List;
 public class InputReader {
 
 
-    final static private String BASE_LOC = System.getProperty("user.dir");
-    final static private String TRAIN_LOC = BASE_LOC + "\\train";
-    //final static private String TEST_LOC = BASE_LOC + "\\test";
-
-    public List<String> maleTrain = new ArrayList<String>();
-    public List<String> femaleTrain = new ArrayList<String>();
+    final static public String BASE_LOC = System.getProperty("user.dir");
+    final static public String TRAIN_LOC = BASE_LOC + "\\train";
+    final static public String TEST_LOC = BASE_LOC + "\\test";
 
     public static void main(String args[]) {
         new InputReader();
@@ -24,8 +21,6 @@ public class InputReader {
 
     public InputReader() {
         System.out.println("This location should contain test and train folders\n" + BASE_LOC);
-        populateList(new File(TRAIN_LOC + "\\F"), femaleTrain);
-        populateList(new File(TRAIN_LOC + "\\M"), maleTrain);
     }
 
 
@@ -41,7 +36,7 @@ public class InputReader {
         return locationStrings;
     }
 
-    private void populateList(final File folder, List<String> list){
+    public List<String> populateList(final File folder, List<String> list){
         for(final String location : listFiles(folder))
             try {
                 String content = readFile(location, StandardCharsets.UTF_8);
@@ -49,6 +44,7 @@ public class InputReader {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        return list;
     }
 
 
