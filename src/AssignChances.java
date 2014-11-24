@@ -6,10 +6,10 @@ import java.util.Set;
 
 
 public class AssignChances {
-	public static int k = 1;
-	public static Map<String, Float> assignChance(List<String[]> set) {
+	public  int k = 1;
+	public  int amountWords = 0;
+	public  Map<String, Float> assignChance(List<String[]> set) {
 		Map<String,Float> returnMap = new HashMap<String, Float>();
-		int amountWords = 0;
 		for (int i = 0; i < set.size(); i++) {
 				amountWords += set.get(i).length;
 			for (int j = 0; j < set.get(i).length; j++) {
