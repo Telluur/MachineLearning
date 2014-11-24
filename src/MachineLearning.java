@@ -5,27 +5,45 @@ import java.util.List;
 
 public class MachineLearning {
 
-    public static void main(String args[]){
-    	new MachineLearning();
-    }
-    
-    public MachineLearning(){
-    	InputReader inputReader = new InputReader();
+    public MachineLearning() {
+        InputReader inputReader = new InputReader();
 
-        List<String> maleTrain = inputReader.populateList(new File(InputReader.TRAIN_LOC + "\\F"), new ArrayList<String>());
-        List<String> femaleTrain = inputReader.populateList(new File(InputReader.TRAIN_LOC + "\\M"), new ArrayList<String>());
+        //Read and tokenize all train files
+        List<String[]> maleTokens = Util.parseString(inputReader.populateList(new File(InputReader.TRAIN_LOC + "\\M"), new ArrayList<String>()));
+        List<String[]> femaleTokens = Util.parseString(inputReader.populateList(new File(InputReader.TRAIN_LOC + "\\F"), new ArrayList<String>()));
 
-        List<String[]> maleTokens = Util.parseString(maleTrain);
-        List<String[]> femaleTokens = Util.parseString(femaleTrain);
-
+        //Create chances
         Chance maleChance = new Chance(maleTokens);
         Chance femaleChance = new Chance(femaleTokens);
 
+        //Read and tokenize test files
+        List<String[]> maleTest = Util.parseString(inputReader.populateList(new File(InputReader.TEST_LOC + "\\M"), new ArrayList<String>()));
+        List<String[]> femaleTest = Util.parseString(inputReader.populateList(new File(InputReader.TEST_LOC + "\\F"), new ArrayList<String>()));
 
-    	List<String> test = new ArrayList<String>();
-    	test.add("hey iets doe nu boe????");
-    	System.out.println(Util.determineType(Util.parseString(test).get(0), maleChance, femaleChance));
-    	
-    	
+
+        System.out.println("\nPredicting the 'TRAIN' set.");
+        testSet(maleTokens,maleChance,femaleChance, "Male");
+        testSet(femaleTokens,maleChance,femaleChance, "Female");
+
+        System.out.println("\nPredicting the 'TEST' set.");
+        testSet(maleTest,maleChance,femaleChance, "Male");
+        testSet(femaleTest,maleChance,femaleChance, "Female");
+    }
+
+    private void testSet(List<String[]> dataset, Chance maleChance, Chance femaleChance, String expected){
+        int hits = 0;
+        for (String[] entry : dataset) {
+            String result = Util.determineType(entry, maleChance, femaleChance);
+            if(result.equals(expected)){
+                hits++;
+            }
+        }
+        int size = dataset.size();
+        float percent = (hits * 100f) / size;
+        System.out.println("Results of '" + expected + "': " + hits + "/" + size + " correct predictions. (" + String.format("%.02f", percent) + "%)");
+    }
+
+    public static void main(String args[]) {
+        new MachineLearning();
     }
 }

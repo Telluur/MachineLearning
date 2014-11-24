@@ -20,7 +20,7 @@ public class InputReader {
     }
 
     public InputReader() {
-        System.out.println("This location should contain test and train folders\n" + BASE_LOC);
+        System.out.println("This location should contain test and train folders: " + BASE_LOC);
     }
 
 

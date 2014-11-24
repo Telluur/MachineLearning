@@ -36,7 +36,7 @@ public class Util {
                 chanceFemale += Math.log(femaleChanceReturnMap.get(text[i]));
             }
         }
-        System.out.println("male: " + chanceMale + " female: " + chanceFemale);
+        //System.out.println("male: " + chanceMale + " female: " + chanceFemale);
 
         return chanceMale > chanceFemale ? "Male" : "Female";
     }
