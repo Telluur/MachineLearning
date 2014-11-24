@@ -1,9 +1,20 @@
-import java.io.Console;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+public class Util {
 
-public class CalculateClass {
-    public static String CalculateClass(String[] text, Chance maleChance, Chance femaleChance) {
+    public static List<String[]> parseString(List<String> set) {
+        List<String[]> returnSet = new ArrayList<String[]>();
+        for (int i = 0; i < set.size(); i++) {
+
+            String[] words = set.get(i).replaceAll("[^a-zA-Z ]", "").toLowerCase().split("\\s+");
+            returnSet.add(words);
+        }
+        return returnSet;
+    }
+
+    public static String determineType(String[] text, Chance maleChance, Chance femaleChance) {
         float chanceMale = 0;
         float chanceFemale = 0;
 

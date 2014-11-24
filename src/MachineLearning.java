@@ -15,8 +15,8 @@ public class MachineLearning {
         List<String> maleTrain = inputReader.populateList(new File(InputReader.TRAIN_LOC + "\\F"), new ArrayList<String>());
         List<String> femaleTrain = inputReader.populateList(new File(InputReader.TRAIN_LOC + "\\M"), new ArrayList<String>());
 
-        List<String[]> maleTokens = ParseText.parseString(maleTrain);
-        List<String[]> femaleTokens = ParseText.parseString(femaleTrain);
+        List<String[]> maleTokens = Util.parseString(maleTrain);
+        List<String[]> femaleTokens = Util.parseString(femaleTrain);
 
         Chance maleChance = new Chance(maleTokens);
         Chance femaleChance = new Chance(femaleTokens);
@@ -24,7 +24,7 @@ public class MachineLearning {
 
     	List<String> test = new ArrayList<String>();
     	test.add("hey iets doe nu boe????");
-    	System.out.println(CalculateClass.CalculateClass(ParseText.parseString(test).get(0), maleChance, femaleChance));
+    	System.out.println(Util.determineType(Util.parseString(test).get(0), maleChance, femaleChance));
     	
     	
     }
