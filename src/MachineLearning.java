@@ -22,28 +22,45 @@ public class MachineLearning {
 
 
         System.out.println("\nPredicting the 'TRAIN' set.");
-        testSet(maleTokens,maleChance,femaleChance, "Male");
-        testSet(femaleTokens,maleChance,femaleChance, "Female");
+        int maleTrainHits = testSet(maleTokens, maleChance, femaleChance, "Male");
+        int femaTrainHits = testSet(femaleTokens, maleChance, femaleChance, "Female");
+        System.out.println("Accuracy: "
+                + (maleTrainHits + femaTrainHits)
+                + "/"
+                + (maleTokens.size() + femaleTokens.size())
+                + " correct predictions. ("
+                + String.format("%.02f", (float) (((maleTrainHits + femaTrainHits) * 100f) / (maleTokens.size() + femaleTokens.size())))
+                + "%)");
 
         System.out.println("\nPredicting the 'TEST' set.");
-        testSet(maleTest,maleChance,femaleChance, "Male");
-        testSet(femaleTest,maleChance,femaleChance, "Female");
+        int maleTestHits = testSet(maleTest, maleChance, femaleChance, "Male");
+        int femaTestHits = testSet(femaleTest, maleChance, femaleChance, "Female");
+        System.out.println("Accuracy: "
+                + (maleTestHits + femaTestHits)
+                + "/"
+                + (maleTest.size() + femaleTest.size())
+                + " correct predictions. ("
+                + String.format("%.02f", (float) (((maleTestHits + femaTestHits) * 100f) / (maleTest.size() + femaleTest.size())))
+                + "%)");
     }
 
-    private void testSet(List<String[]> dataset, Chance maleChance, Chance femaleChance, String expected){
+    private int testSet(List<String[]> dataset, Chance maleChance, Chance femaleChance, String expected) {
         int hits = 0;
         for (String[] entry : dataset) {
             String result = Util.determineType(entry, maleChance, femaleChance);
-            if(result.equals(expected)){
+            if (result.equals(expected)) {
                 hits++;
             }
         }
         int size = dataset.size();
         float percent = (hits * 100f) / size;
         System.out.println("Results of '" + expected + "': " + hits + "/" + size + " correct predictions. (" + String.format("%.02f", percent) + "%)");
+
+        return hits;
     }
 
     public static void main(String args[]) {
         new MachineLearning();
     }
+
 }
