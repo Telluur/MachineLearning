@@ -14,11 +14,12 @@ public class InputReader {
     final static private String TRAIN_LOC = BASE_LOC + "\\train";
     //final static private String TEST_LOC = BASE_LOC + "\\test";
 
-    private List<String> maleTrain = new ArrayList<String>();
-    private List<String> femaleTrain = new ArrayList<String>();
+    public List<String> maleTrain = new ArrayList<String>();
+    public List<String> femaleTrain = new ArrayList<String>();
 
     public static void main(String args[]) {
         new InputReader();
+        
     }
 
     public InputReader() {

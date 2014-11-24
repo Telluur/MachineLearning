@@ -13,7 +13,7 @@ public class ParseText {
 		return returnset;
 		
 	}
-	public static void main (String[] args) {
+	public void main (String[] args) {
 		List<String> test = new ArrayList<String>();
 		test.add("hoi Werkt, dit??? xD\t \r \n nnooo sdfsdfd;sa da[]?");
 		List<String[]> tester = parseString(test);
