@@ -1,3 +1,5 @@
+package A;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -11,8 +13,8 @@ public class InputReader {
 
 
     final static public String BASE_LOC = System.getProperty("user.dir");
-    final static public String TRAIN_LOC = BASE_LOC + "\\train";
-    final static public String TEST_LOC = BASE_LOC + "\\test";
+    final static public String BLOG_LOC = BASE_LOC + "\\blog";
+    final static public String EMAIL_LOC = BASE_LOC + "\\spammail";
 
     public static void main(String args[]) {
         new InputReader();
@@ -20,7 +22,7 @@ public class InputReader {
     }
 
     public InputReader() {
-        System.out.println("This location should contain test and train folders: " + BASE_LOC);
+        System.out.println("user.dir: " + BASE_LOC);
     }
 
 
