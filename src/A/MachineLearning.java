@@ -1,10 +1,12 @@
 package A;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Part A main
+ */
 public class MachineLearning {
     public static final float SMOOTHING = 1;
     public static final float BLOG_SMOOTHING = 0.00001f;
@@ -16,11 +18,14 @@ public class MachineLearning {
         email();
     }
 
+    /**
+     * Shows accuracy & statistics for the blogs.
+     */
     private void blog() {
-        List<String[]> maleTrain = Util.tokenizeString(inputReader.populateList(new File(InputReader.BLOG_LOC + "\\train\\M"), new ArrayList<String>()));
-        List<String[]> femaleTrain = Util.tokenizeString(inputReader.populateList(new File(InputReader.BLOG_LOC + "\\train\\F"), new ArrayList<String>()));
-        List<String[]> maleTest = Util.tokenizeString(inputReader.populateList(new File(InputReader.BLOG_LOC + "\\test\\M"), new ArrayList<String>()));
-        List<String[]> femaleTest = Util.tokenizeString(inputReader.populateList(new File(InputReader.BLOG_LOC + "\\test\\F"), new ArrayList<String>()));
+        List<String[]> maleTrain = Util.tokenizeString(inputReader.generateAndPopulateList(new File(InputReader.BLOG_LOC + "\\train\\M")));
+        List<String[]> femaleTrain = Util.tokenizeString(inputReader.generateAndPopulateList(new File(InputReader.BLOG_LOC + "\\train\\F")));
+        List<String[]> maleTest = Util.tokenizeString(inputReader.generateAndPopulateList(new File(InputReader.BLOG_LOC + "\\test\\M")));
+        List<String[]> femaleTest = Util.tokenizeString(inputReader.generateAndPopulateList(new File(InputReader.BLOG_LOC + "\\test\\F")));
 
         Map<String, WordChances> dictionary = Util.calculateChances(Util.createDictionary(maleTrain, femaleTrain), SMOOTHING);
         Map<String, WordChances> dictionaryCustom = Util.calculateChances(Util.createDictionary(maleTrain, femaleTrain), BLOG_SMOOTHING);
@@ -39,15 +44,18 @@ public class MachineLearning {
         determineAccuracy(dictionaryCustom, maleTest, femaleTest, "male", "female");
     }
 
-    private void email(){
-        //There are no seperate train & test sets provided. We divide the material provided in 90% train and 10% test.
-        List<String[]> ham = Util.tokenizeString(inputReader.populateList(new File(InputReader.EMAIL_LOC + "\\ham"), new ArrayList<String>()));
-        List<String[]> spam = Util.tokenizeString(inputReader.populateList(new File(InputReader.EMAIL_LOC + "\\spam"), new ArrayList<String>()));
+    /**
+     * Shows accuracy & statistics for the spammails.
+     */
+    private void email() {
+        //There are no separate train & test sets provided. We divide the material in 90% train and 10% test.
+        List<String[]> ham = Util.tokenizeString(inputReader.generateAndPopulateList(new File(InputReader.EMAIL_LOC + "\\ham")));
+        List<String[]> spam = Util.tokenizeString(inputReader.generateAndPopulateList(new File(InputReader.EMAIL_LOC + "\\spam")));
         int trainingHam = (int) (ham.size() * 90 / 100f);
         int trainingSpam = (int) (spam.size() * 90 / 100f);
-        List<String[]> hamTrain =  ham.subList(0, trainingHam);
-        List<String[]> spamTrain =  spam.subList(0, trainingSpam);
-        List<String[]> hamTest =  ham.subList(trainingHam, ham.size());
+        List<String[]> hamTrain = ham.subList(0, trainingHam);
+        List<String[]> spamTrain = spam.subList(0, trainingSpam);
+        List<String[]> hamTest = ham.subList(trainingHam, ham.size());
         List<String[]> spamTest = spam.subList(trainingSpam, spam.size());
 
         Map<String, WordChances> dictionary = Util.calculateChances(Util.createDictionary(hamTrain, spamTrain), SMOOTHING);
@@ -65,11 +73,17 @@ public class MachineLearning {
         determineAccuracy(dictionaryCustom, hamTrain, spamTrain, "ham", "spam");
         System.out.println("\nPredicting the 'TEST' set");
         determineAccuracy(dictionaryCustom, hamTest, spamTest, "ham", "spam");
-
-
-
     }
 
+    /**
+     * Prints (useful) statistics about the accuracy of the two testsets.
+     *
+     * @param dictionary dictionary with chances for the set1 and set2 respectively
+     * @param set1       tokenized set
+     * @param set2       tokenized set
+     * @param set1Name   actual name of set1
+     * @param set2Name   actual name of set2
+     */
     private void determineAccuracy(Map<String, WordChances> dictionary, List<String[]> set1, List<String[]> set2, String set1Name, String set2Name) {
         int set1Hits = 0;
         int set2Hits = 0;
@@ -102,5 +116,4 @@ public class MachineLearning {
     public static void main(String args[]) {
         new MachineLearning();
     }
-
 }

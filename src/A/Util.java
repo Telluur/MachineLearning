@@ -4,16 +4,28 @@ import java.util.*;
 
 public class Util {
 
+    /**
+     * Tokenizes a list of text to an array of words
+     *
+     * @param set list containing the text
+     * @return tokenized texts
+     */
     public static List<String[]> tokenizeString(List<String> set) {
         List<String[]> returnSet = new ArrayList<String[]>();
         for (String word : set) {
-
             String[] words = word.replaceAll("[^a-zA-Z ]", "").toLowerCase().split("\\s+");
             returnSet.add(words);
         }
         return returnSet;
     }
 
+    /**
+     * Creates a dictionary based on two tokenized sets.
+     *
+     * @param tokenSet1 tokenized Strings array for set1
+     * @param tokenSet2 tokenized Strings array for set2
+     * @return dictionary containing words with their respective number of occurrences in set1 and set2
+     */
     public static Map<String, WordValues> createDictionary(List<String[]> tokenSet1, List<String[]> tokenSet2) {
         Map<String, WordValues> dictionary = new TreeMap<String, WordValues>();
         for (String[] tokens : tokenSet1) {
@@ -27,7 +39,6 @@ public class Util {
                 }
             }
         }
-
         for (String[] tokens : tokenSet2) {
             for (String word : tokens) {
                 if (dictionary.containsKey(word)) { //dictionary already contains word.
@@ -42,8 +53,14 @@ public class Util {
         return dictionary;
     }
 
+    /**
+     * Calculates the chances for a dictionary
+     *
+     * @param dictionary dictionary containing words and their respective number of occurrences in the train set.
+     * @param smoothing  Laplacian smoothing factor
+     * @return word dictionary containing chances based on the number of occurrences in the train set.
+     */
     public static Map<String, WordChances> calculateChances(Map<String, WordValues> dictionary, float smoothing) {
-        //get values for chance calculations
         int set1Words = 0;
         int set2Words = 0;
         int dictionarySize = dictionary.size();
@@ -51,31 +68,33 @@ public class Util {
             set1Words = set1Words + entry.getSet1Occurrences();
             set2Words = set2Words + entry.getSet2Occurrences();
         }
-
         Map<String, WordValues> dictionaryCopy = new TreeMap<String, WordValues>(dictionary);
         Map<String, WordChances> chancesMap = new TreeMap<String, WordChances>();
-
-        //calculate chances
         Iterator it = dictionaryCopy.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry entry = (Map.Entry) it.next();
-
             String entryString = (String) entry.getKey();
+            //Laplacian smoothing
             float set1Chance = (((WordValues) entry.getValue()).getSet1Occurrences() + smoothing) / (set1Words + smoothing * dictionarySize);
             float set2Chance = (((WordValues) entry.getValue()).getSet2Occurrences() + smoothing) / (set2Words + smoothing * dictionarySize);
             chancesMap.put(entryString, new WordChances(set1Chance, set2Chance));
-
             it.remove(); // avoids a ConcurrentModificationException
         }
-
-
         return chancesMap;
     }
 
+    /**
+     * Determines based on the dictionary how to classify the text
+     *
+     * @param text       to be classified tokenized string
+     * @param dictionary contains words and their respective chance values for set1Name and set2Name
+     * @param set1Name   actual name of first set
+     * @param set2Name   actual name of second set
+     * @return the name of the classified set
+     */
     public static String determineType(String[] text, Map<String, WordChances> dictionary, String set1Name, String set2Name) {
         float set1Result = 0;
         float set2Result = 0;
-
         for (String word : text) {
             if (dictionary.containsKey(word)) {
                 set1Result += Math.log(dictionary.get(word).getSet1Chance());
