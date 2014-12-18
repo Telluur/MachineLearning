@@ -1,4 +1,4 @@
-package WEKAshit;
+package B;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Scanner;
 
@@ -38,26 +39,34 @@ public class TxtToArff {
 
 
 	public static String corpusFolderPath = System.getProperty("user.dir");
-	public static String trainPath = corpusFolderPath + "\\train";
-	public static String testPath = corpusFolderPath + "\\test";
-
+	public static String trainPath = corpusFolderPath + "\\blog\\train";
+	public static String testPath = corpusFolderPath + "\\blog\\test";
+	public Instances train;
+	public Instances trainData;
+	public Instances trainUpdate;
+	public Instances trainDataUpdate;
 
 	public static void main(String[] args) throws Exception {
 		TxtToArff txttoarff = new TxtToArff();
 		Instances train = txttoarff.createArrf(trainPath);
-		Instances test = txttoarff.createArrf(testPath);
-		StringToWordVector stw = txttoarff.createSTW(train);
-		train = txttoarff.filterData(train, stw);
-		test = txttoarff.filterData(test, stw);
-		txttoarff.NBC(train, test);
-		Instances spamham = txttoarff.createArrf(corpusFolderPath + "\\spammail");
-		Instances[] spamhamarray = txttoarff.splitSet(spamham, 90);
-		Instances train2 = spamhamarray[0];
-		Instances test2 = spamhamarray[1];
-		StringToWordVector stw2 = txttoarff.createSTW(train2);
-		train2 = txttoarff.filterData(train2, stw2);
-		test2 = txttoarff.filterData(test2, stw2);
-		txttoarff.LR(train2, test2);
+		txttoarff.writeARFF(train, "trainearly.arff");
+//		Instances test = txttoarff.createArrf(testPath);
+//		StringToWordVector stw = txttoarff.createSTW(train);
+//		train = txttoarff.filterData(train, stw);
+//		test = txttoarff.filterData(test, stw);
+//		for (int i = 0; i < 50; i++) {
+//			System.out.println(txttoarff.classifyJ48(train, test.instance(i)));
+//		}
+//		txttoarff.NBC(train, test);
+//		Instances spamham = txttoarff.createArrf(corpusFolderPath + "\\spammail");
+//		Instances[] spamhamarray = txttoarff.splitSet(spamham, 90);
+//		Instances train2 = spamhamarray[0];
+//		Instances test2 = spamhamarray[1];
+//		StringToWordVector stw2 = txttoarff.createSTW(train2);
+//		train2 = txttoarff.filterData(train2, stw2);
+//		test2 = txttoarff.filterData(test2, stw2);
+//		txttoarff.LR(train2, test2);
+		
 	}
 	
 
@@ -74,6 +83,57 @@ public class TxtToArff {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	private void setTrain(String path) {
+		train = createArrf(trainPath);
+		trainUpdate = train;
+	}
+	
+	
+	private String classifyInstanceJ48(Instances instances, int i) {
+		StringToWordVector stw = createSTW(train);
+		train = filterData(train, stw);
+		instances = filterData(instances, stw);
+		return classifyJ48(train, instances.instance(i));
+	}
+	
+	private String classifyUpdateInstanceJ48(Instances instances, int i) {
+		StringToWordVector stw = createSTW(trainUpdate);
+		trainDataUpdate = filterData(trainUpdate, stw);
+		instances = filterData(instances, stw);
+		trainData.add(instances.instance(i));
+		return classifyJ48(trainDataUpdate, instances.instance(i));
+	}
+	
+	private String classifyInstanceNBC(Instances instances, int i) {
+		StringToWordVector stw = createSTW(train);
+		train = filterData(train, stw);
+		instances = filterData(instances, stw);
+		return classifyNBC(train, instances.instance(i));
+	}
+	
+	private String classifyUpdateInstanceNBC(Instances instances, int i) {
+		StringToWordVector stw = createSTW(trainUpdate);
+		trainDataUpdate = filterData(trainUpdate, stw);
+		instances = filterData(instances, stw);
+		trainData.add(instances.instance(i));
+		return classifyNBC(trainDataUpdate, instances.instance(i));
+	}
+	
+	private String classifyInstanceLR(Instances instances, int i) {
+		StringToWordVector stw = createSTW(train);
+		train = filterData(train, stw);
+		instances = filterData(instances, stw);
+		return classifyLR(train, instances.instance(i));
+	}
+	
+	private String classifyUpdateInstanceLR(Instances instances, int i) {
+		StringToWordVector stw = createSTW(trainUpdate);
+		trainDataUpdate = filterData(trainUpdate, stw);
+		instances = filterData(instances, stw);
+		trainData.add(instances.instance(i));
+		return classifyLR(trainDataUpdate, instances.instance(i));
 	}
 	
 	private Instances[] splitSet(Instances data, int percent) {
@@ -179,6 +239,61 @@ public class TxtToArff {
 			e.printStackTrace();
 		}
 		 
+	}
+	
+	
+	
+	private String classifyJ48(Instances trainData, Instance inst) {
+		Classifier cModel = (Classifier)new J48();
+		try {
+			cModel.buildClassifier(trainData);
+			if (cModel.classifyInstance(inst) == 1) {
+				return "Male";
+			} else {
+				return "Female";
+			}
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return " error";
+		
+	}
+	private String classifyNBC(Instances trainData, Instance inst) {
+		Classifier cModel = (Classifier)new NaiveBayes();
+		try {
+			cModel.buildClassifier(trainData);
+			if (cModel.classifyInstance(inst) == 1) {
+				return "Male";
+			} else {
+				return "Female";
+			}
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return " error";
+		
+	}
+	
+	private String classifyLR(Instances trainData, Instance inst) {
+		Classifier cModel = (Classifier)new BayesianLogisticRegression();
+		try {
+			cModel.buildClassifier(trainData);
+			if (cModel.classifyInstance(inst) == 1) {
+				return "Male";
+			} else {
+				return "Female";
+			}
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return " error";
+		
 	}
 
 	
