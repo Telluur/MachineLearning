@@ -1,4 +1,4 @@
-@relation 'C__Users_niels_Documents_MachineLearning_train-weka.filters.unsupervised.attribute.Standardize-weka.filters.unsupervised.attribute.StringToWordVector-R1-W1000-prune-rate-1.0-C-T-I-N0-stemmerweka.core.stemmers.NullStemmer-M1-O-tokenizerweka.core.tokenizers.WordTokenizer -delimiters \" \\r\\n\\t.,;:\\\'\\\"()?!\"'
+@relation 'C__Users_niels_Documents_MachineLearning_train-weka.filters.unsupervised.attribute.StringToWordVector-R1-W1000-prune-rate-1.0-C-T-I-N0-stemmerweka.core.stemmers.NullStemmer-M1-O-tokenizerweka.core.tokenizers.WordTokenizer -delimiters \" \\r\\n\\t.,;:\\\'\\\"()?!\"'
 
 @attribute @@class@@ {F,M}
 @attribute & numeric

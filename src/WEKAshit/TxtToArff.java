@@ -10,10 +10,12 @@ import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 import java.util.Scanner;
 
+import sun.font.CreatedFontTracker;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.meta.FilteredClassifier;
 import weka.classifiers.trees.J48;
+import weka.classifiers.bayes.BayesianLogisticRegression;
 import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.bayes.NaiveBayesSimple;
 import weka.core.Attribute;
@@ -34,93 +36,32 @@ import weka.filters.unsupervised.attribute.StringToWordVector;
 
 public class TxtToArff {
 
-	// Change this value to either explicitly apply pre-filtering (visible in
-	// the .arff), or to apply it internally, when building the classifier.
-	public static final boolean PREFILTERING = true;
 
 	public static String corpusFolderPath = System.getProperty("user.dir");
 	public static String trainPath = corpusFolderPath + "\\train";
 	public static String testPath = corpusFolderPath + "\\test";
 
-	public static String spamString = "buy $ now!";
-	public static String hamString = "This won't waste your time, as it is not spam.";
-	public static String spamString2 = "It is not possible to unsubscribe from this spam, haha!";
 
 	public static void main(String[] args) throws Exception {
-		TextDirectoryLoader test = new TextDirectoryLoader();
-		test.setDirectory(new File(trainPath));
-		Instances train = test.getDataSet();  
-		writeARFF(train, "testtrain.arff");
-		//System.out.println(test.getDataSet().numInstances());
-		TextDirectoryLoader test2 = new TextDirectoryLoader();
-		test2.setDirectory(new File(testPath));
-		Instances testset = test2.getDataSet();   
-		writeARFF(testset, "testtesttest.arff");
-		
-		  // from somewhere
-		 System.out.println(train.numInstances());
-		// System.out.println(test.getDataSet().numInstances());
-		  // from somewhere
-		 Standardize filter = new Standardize();
-		 filter.setInputFormat(train);  // initializing the filter once with training set
-		 Instances newTrain = Filter.useFilter(train, filter);  // configures the Filter based on train instances and returns filtered instances
-		 Instances newTest = Filter.useFilter(testset, filter);    // create new test set
-		 StringToWordVector stwfilter = new StringToWordVector();
-		 String[] options = new String[7];
-		 options[6] = "-C";
-		 options[0] = "-I";
-		 options[1] = "-R 1,2,3";
-		 options[2] = "-O";
-		 options[3] = "-T";
-		 options[4] = "-N 0";
-		 options[5] = "-M 1";
-		 System.out.println(train.numInstances());
-		 System.out.println(newTrain.numInstances());
-		stwfilter.setOptions(options);
-		 stwfilter.setInputFormat(newTrain);
-		Instances dataFiltered = Filter.useFilter(newTrain, stwfilter);
-		writeARFF(dataFiltered, "train_generated_self.arff");
-		 stwfilter.setInputFormat(newTest);
-		 Instances dataFiltered2 = Filter.useFilter(newTest, stwfilter);
-		writeARFF(dataFiltered2, "test_generated_self.arff");
-
-		BufferedReader reader = new BufferedReader(new FileReader(
-				   "blogs_train_generated.arff"));
-				 ArffReader arff = new ArffReader(reader);
-		Instances trainData = arff.getData();
-		trainData.setClassIndex(0);
-		System.out.println(trainData.numAttributes() - 1);
-		BufferedReader reader2 = new BufferedReader(new FileReader(
-				   "blogs_test_generated.arff"));
-				 ArffReader arff2 = new ArffReader(reader2);
-		Instances testData = arff2.getData();
-		testData.setClassIndex(0);
-		Classifier cModel = (Classifier)new NaiveBayes();
-		 cModel.buildClassifier(trainData);
-		 Evaluation eTest = new Evaluation(trainData);
-		 eTest.evaluateModel(cModel, testData);
-			int percent = 0;
-			for (int i = 0; i < testData.numInstances(); i++) {
-				Instance iUse = testData.instance(i);
-				 iUse.setDataset(trainData);
-				double[] fDistribution = cModel.distributionForInstance(iUse);
-				int pred = 0;
-				if (fDistribution[0] < fDistribution[1] ) {
-					pred = 1;
-				}
-			System.out.println("Class: "+ testData.classAttribute().value((int) testData.instance(i).classValue()));
-			System.out.println("Class predicted: " + testData.classAttribute().value( pred));
-			if (testData.classAttribute().value((int) testData.instance(i).classValue()).equals(testData.classAttribute().value((int) pred))) {
-				percent += 1;
-			}
-			}
-			System.out.println("Corrent: " + percent);
-			System.out.println("Total: " + testData.numInstances());
-
-
+		TxtToArff txttoarff = new TxtToArff();
+		Instances train = txttoarff.createArrf(trainPath);
+		Instances test = txttoarff.createArrf(testPath);
+		StringToWordVector stw = txttoarff.createSTW(train);
+		train = txttoarff.filterData(train, stw);
+		test = txttoarff.filterData(test, stw);
+		txttoarff.NBC(train, test);
+		Instances spamham = txttoarff.createArrf(corpusFolderPath + "\\spammail");
+		Instances[] spamhamarray = txttoarff.splitSet(spamham, 90);
+		Instances train2 = spamhamarray[0];
+		Instances test2 = spamhamarray[1];
+		StringToWordVector stw2 = txttoarff.createSTW(train2);
+		train2 = txttoarff.filterData(train2, stw2);
+		test2 = txttoarff.filterData(test2, stw2);
+		txttoarff.LR(train2, test2);
 	}
+	
 
-	private static void writeARFF(Instances data, String fileName) {
+	private void writeARFF(Instances data, String fileName) {
 		PrintWriter writer;
 		try {
 			writer = new PrintWriter(fileName, "UTF-8");
@@ -133,6 +74,111 @@ public class TxtToArff {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	private Instances[] splitSet(Instances data, int percent) {
+		int trainSize = (int) Math.round(data.numInstances() * percent
+			    / 100);
+			int testSize = data.numInstances() - trainSize;
+			Instances train = new Instances(data, 0, trainSize);
+			Instances test = new Instances(data, trainSize, testSize);
+			Instances[] result = new Instances[]{train,test};
+			return result;
+	}
+	
+	private Instances createArrf(String path) {
+		Instances train = null;
+		TextDirectoryLoader test = new TextDirectoryLoader();
+		try {
+			test.setDirectory(new File(path));
+			train = test.getDataSet();  
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return train;
+	}
+	
+	private StringToWordVector createSTW(Instances data) {
+		 StringToWordVector stwfilter = new StringToWordVector();
+		 String[] options = new String[7];
+		 options[6] = "-C";
+		 options[0] = "-I";
+		 options[1] = "-R 1,2,3";
+		 options[2] = "-O";
+		 options[3] = "-T";
+		 options[4] = "-N 0";
+		 options[5] = "-M 1";
+		
+		 try {
+			stwfilter.setInputFormat(data);
+			stwfilter.setOptions(options);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 return stwfilter;
+		 
+	}
+	
+	private Instances filterData (Instances data, Filter filter) {
+		Instances dataFiltered = null;
+		try {
+			dataFiltered = Filter.useFilter(data, filter);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return dataFiltered;
+	}
+	
+	private void NBC (Instances trainData, Instances testData) {
+		Classifier cModel = (Classifier)new NaiveBayes();
+		 try {
+			cModel.buildClassifier(trainData);
+			Evaluation eTest = new Evaluation(trainData);
+			 eTest.evaluateModel(cModel, testData);
+			System.out.println(eTest.toSummaryString());
+			System.out.println(eTest.toClassDetailsString());
+			System.out.println(eTest.toMatrixString());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 
+	}
+	
+	private void LR(Instances trainData, Instances testData) {
+		Classifier cModel = (Classifier)new BayesianLogisticRegression();
+		 try {
+			cModel.buildClassifier(trainData);
+			Evaluation eTest = new Evaluation(trainData);
+			 eTest.evaluateModel(cModel, testData);
+			System.out.println(eTest.toSummaryString());
+			System.out.println(eTest.toClassDetailsString());
+			System.out.println(eTest.toMatrixString());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 
+	}
+	
+	private void J48(Instances trainData, Instances testData) {
+		Classifier cModel = (Classifier)new J48();
+		 try {
+			cModel.buildClassifier(trainData);
+			Evaluation eTest = new Evaluation(trainData);
+			 eTest.evaluateModel(cModel, testData);
+			System.out.println(eTest.toSummaryString());
+			System.out.println(eTest.toClassDetailsString());
+			System.out.println(eTest.toMatrixString());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 
 	}
 
 	
