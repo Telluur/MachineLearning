@@ -1,5 +1,7 @@
 package A;
 
+import Utilities.InputReader;
+
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -22,13 +24,13 @@ public class MachineLearning {
      * Shows accuracy & statistics for the blogs.
      */
     private void blog() {
-        List<String[]> maleTrain = Util.tokenizeString(inputReader.generateAndPopulateList(new File(InputReader.BLOG_LOC + "\\train\\M")));
-        List<String[]> femaleTrain = Util.tokenizeString(inputReader.generateAndPopulateList(new File(InputReader.BLOG_LOC + "\\train\\F")));
-        List<String[]> maleTest = Util.tokenizeString(inputReader.generateAndPopulateList(new File(InputReader.BLOG_LOC + "\\test\\M")));
-        List<String[]> femaleTest = Util.tokenizeString(inputReader.generateAndPopulateList(new File(InputReader.BLOG_LOC + "\\test\\F")));
+        List<String[]> maleTrain = Util.tokenizeStringList(inputReader.generateAndPopulateList(new File(InputReader.BLOG_LOC + "\\train\\M")));
+        List<String[]> femaleTrain = Util.tokenizeStringList(inputReader.generateAndPopulateList(new File(InputReader.BLOG_LOC + "\\train\\F")));
+        List<String[]> maleTest = Util.tokenizeStringList(inputReader.generateAndPopulateList(new File(InputReader.BLOG_LOC + "\\test\\M")));
+        List<String[]> femaleTest = Util.tokenizeStringList(inputReader.generateAndPopulateList(new File(InputReader.BLOG_LOC + "\\test\\F")));
 
-        Map<String, WordChances> dictionary = Util.calculateChances(Util.createDictionary(maleTrain, femaleTrain), SMOOTHING);
-        Map<String, WordChances> dictionaryCustom = Util.calculateChances(Util.createDictionary(maleTrain, femaleTrain), BLOG_SMOOTHING);
+        Map<String, WordChances> dictionary = Util.createWordChancesDictionary(Util.createWordValuesDictionary(maleTrain, femaleTrain), SMOOTHING);
+        Map<String, WordChances> dictionaryCustom = Util.createWordChancesDictionary(Util.createWordValuesDictionary(maleTrain, femaleTrain), BLOG_SMOOTHING);
 
         System.out.println("\n\n############################## Blogs ##############################");
         System.out.printf("####################### Smoothing: %f #######################\n", SMOOTHING);
@@ -49,8 +51,8 @@ public class MachineLearning {
      */
     private void email() {
         //There are no separate train & test sets provided. We divide the material in 90% train and 10% test.
-        List<String[]> ham = Util.tokenizeString(inputReader.generateAndPopulateList(new File(InputReader.EMAIL_LOC + "\\ham")));
-        List<String[]> spam = Util.tokenizeString(inputReader.generateAndPopulateList(new File(InputReader.EMAIL_LOC + "\\spam")));
+        List<String[]> ham = Util.tokenizeStringList(inputReader.generateAndPopulateList(new File(InputReader.EMAIL_LOC + "\\ham")));
+        List<String[]> spam = Util.tokenizeStringList(inputReader.generateAndPopulateList(new File(InputReader.EMAIL_LOC + "\\spam")));
         int trainingHam = (int) (ham.size() * 90 / 100f);
         int trainingSpam = (int) (spam.size() * 90 / 100f);
         List<String[]> hamTrain = ham.subList(0, trainingHam);
@@ -58,8 +60,8 @@ public class MachineLearning {
         List<String[]> hamTest = ham.subList(trainingHam, ham.size());
         List<String[]> spamTest = spam.subList(trainingSpam, spam.size());
 
-        Map<String, WordChances> dictionary = Util.calculateChances(Util.createDictionary(hamTrain, spamTrain), SMOOTHING);
-        Map<String, WordChances> dictionaryCustom = Util.calculateChances(Util.createDictionary(hamTrain, spamTrain), EMAIL_SMOOTHING);
+        Map<String, WordChances> dictionary = Util.createWordChancesDictionary(Util.createWordValuesDictionary(hamTrain, spamTrain), SMOOTHING);
+        Map<String, WordChances> dictionaryCustom = Util.createWordChancesDictionary(Util.createWordValuesDictionary(hamTrain, spamTrain), EMAIL_SMOOTHING);
 
         System.out.println("\n\n############################## Email ##############################");
         System.out.printf("####################### Smoothing: %f #######################\n", SMOOTHING);
@@ -89,14 +91,14 @@ public class MachineLearning {
         int set2Hits = 0;
 
         for (String[] set1Entry : set1) {
-            String result = Util.determineType(set1Entry, dictionary, set1Name, set2Name);
+            String result = Util.determineType(set1Entry, dictionary, set1Name, set2Name, false);
             if (result.equals(set1Name)) {
                 set1Hits++;
             }
         }
 
         for (String[] set2Entry : set2) {
-            String result = Util.determineType(set2Entry, dictionary, set1Name, set2Name);
+            String result = Util.determineType(set2Entry, dictionary, set1Name, set2Name, false);
             if (result.equals(set2Name)) {
                 set2Hits++;
             }
