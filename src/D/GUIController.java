@@ -50,10 +50,10 @@ public class GUIController {
             System.exit(1);
         }
 
-        for(String entry : set1Test){
+        for (String entry : set1Test) {
             queue.add(new String[]{entry, set.getSet1()});
         }
-        for(String entry : set2Test){
+        for (String entry : set2Test) {
             queue.add(new String[]{entry, set.getSet2()});
         }
 
@@ -64,72 +64,67 @@ public class GUIController {
         startupForm.dispose();
         learner = new LearnerForm("Interactive Learner [" + set.getDisplay() + "] [NBC]", this);
         learner.setBusy();
-        determineMessage(queuePosition, true);
+        determineMessage(queuePosition, true, true);
     }
 
-    public String[] determineMessage(int position, boolean updateScreen) {
-        if(position < queue.size()){
+    public String[] determineMessage(int position, boolean updateScreen, boolean enableLearner) {
+        if (position < queue.size()) {
             String[] entry = queue.get(position);
             String message = entry[0];
             String actualSet = entry[1];
             String[] tokens = Util.tokenizeString(message);
             String staticResult = Util.determineType(tokens, staticDictionary, set.getSet1(), set.getSet2(), true);
             String learnerResult = Util.determineType(tokens, learnerDictionary, set.getSet1(), set.getSet2(), 1, true);
-            if (updateScreen) learner.updateScreen(message, staticResult, learnerResult, actualSet);
+            if (updateScreen) learner.updateScreen(message, staticResult, learnerResult, actualSet, enableLearner);
             return new String[]{staticResult, learnerResult, actualSet};
-        }else{
+        } else {
             learner.setDone();
             return null;
         }
     }
 
-    public void selectSet1(){
+    public void selectSet1() {
         Util.addToWordValuesDictionary(learnerDictionary, Util.tokenizeString(queue.get(queuePosition)[0]), null);
         queuePosition++;
-        determineMessage(queuePosition, true);
+        determineMessage(queuePosition, true, true);
     }
 
-    public void selectSet2(){
+    public void selectSet2() {
         Util.addToWordValuesDictionary(learnerDictionary, null, Util.tokenizeString(queue.get(queuePosition)[0]));
         queuePosition++;
-        determineMessage(queuePosition, true);
+        determineMessage(queuePosition, true, true);
     }
 
 
     public void showLearner() {
-        while(true){
-            String[] resultSet = determineMessage(queuePosition, false);
-            if(resultSet == null) break; //no more entries to test.
+        while (true) {
+            String[] resultSet = determineMessage(queuePosition, false, false);
+            if (resultSet == null) break; //no more entries to test.
             System.out.println(queuePosition + " " + resultSet[0] + " " + resultSet[1]);
-            if(resultSet[0].equals(resultSet[1])){
-                if(resultSet[2].equals(Set.HAM_SPAM.getSet1()) || resultSet[2].equals(Set.MALE_FEMALE.getSet1())){
+            if (resultSet[0].equals(resultSet[1])) {
+                if (resultSet[2].equals(Set.HAM_SPAM.getSet1()) || resultSet[2].equals(Set.MALE_FEMALE.getSet1())) {
                     Util.addToWordValuesDictionary(learnerDictionary, Util.tokenizeString(queue.get(queuePosition)[0]), null);
-                }else if(resultSet[2].equals(Set.HAM_SPAM.getSet2()) || resultSet[2].equals(Set.MALE_FEMALE.getSet2())){
+                } else if (resultSet[2].equals(Set.HAM_SPAM.getSet2()) || resultSet[2].equals(Set.MALE_FEMALE.getSet2())) {
                     Util.addToWordValuesDictionary(learnerDictionary, null, Util.tokenizeString(queue.get(queuePosition)[0]));
-                }else{
+                } else {
                     System.out.println("Something went wrong.....");
                     break; //should never happen
                 }
 
 
-            }else{
-                determineMessage(queuePosition, true);
+            } else {
+                determineMessage(queuePosition, true, false);
                 break; //Difference between static and learner found.
             }
             queuePosition++;
         }
     }
 
-
-    public void setSet(Set set) {
-        this.set = set;
-    }
-
     public Set getSet() {
         return set;
     }
 
-    public static void main(String args[]) {
-        new GUIController();
+    public void setSet(Set set) {
+        this.set = set;
     }
 }

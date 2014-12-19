@@ -1,8 +1,8 @@
 package D;
 
 public enum Set {
-    HAM_SPAM("Ham","Spam","Ham/Spam"),
-    MALE_FEMALE("Male","Female","Male/Female");
+    HAM_SPAM("Ham", "Spam", "Ham/Spam"),
+    MALE_FEMALE("Male", "Female", "Male/Female");
 
     private String set1;
     private String set2;

@@ -18,7 +18,7 @@ public class Util {
         return returnSet;
     }
 
-    public static String[] tokenizeString(String string){
+    public static String[] tokenizeString(String string) {
         return string.replaceAll("[^a-zA-Z ]", "").toLowerCase().split("\\s+");
     }
 
@@ -57,7 +57,7 @@ public class Util {
         return dictionary;
     }
 
-    public static Map<String, WordValues> addToWordValuesDictionary(Map<String, WordValues> dictionary, String[] set1Tokens, String[] set2Tokens){
+    public static Map<String, WordValues> addToWordValuesDictionary(Map<String, WordValues> dictionary, String[] set1Tokens, String[] set2Tokens) {
         if (set1Tokens != null) {
             for (String word : set1Tokens) {
                 if (dictionary.containsKey(word)) { //dictionary already contains word.
@@ -131,11 +131,12 @@ public class Util {
                 set2Result += Math.log(dictionary.get(word).getSet2Chance());
             }
         }
-        if(printChances) System.out.println("Static | " + set1Name + "=" + set1Result +  " " + set2Name + "=" + set2Result);
+        if (printChances)
+            System.out.println("Static | " + set1Name + "=" + set1Result + " " + set2Name + "=" + set2Result);
         return set1Result > set2Result ? set1Name : set2Name;
     }
 
-    public static String determineType(String[] text, Map<String, WordValues> dictionary, String set1Name, String set2Name, float smoothing, boolean printChances){
+    public static String determineType(String[] text, Map<String, WordValues> dictionary, String set1Name, String set2Name, float smoothing, boolean printChances) {
         int set1Words = 0;
         int set2Words = 0;
         int dictionarySize = dictionary.size();
@@ -145,17 +146,18 @@ public class Util {
         }
         float set1Result = 0;
         float set2Result = 0;
-        for(String word : text){
+        for (String word : text) {
             int set1Occurrences = 0;
             int set2Occurrences = 0;
-            if(dictionary.containsKey(word)){
+            if (dictionary.containsKey(word)) {
                 set1Occurrences = dictionary.get(word).getSet1Occurrences();
                 set2Occurrences = dictionary.get(word).getSet2Occurrences();
             }
             set1Result += Math.log((set1Occurrences + smoothing) / (set1Words + smoothing * dictionarySize));
             set2Result += Math.log((set2Occurrences + smoothing) / (set2Words + smoothing * dictionarySize));
         }
-        if(printChances) System.out.println("Learning | " + set1Name + "=" + set1Result +  " " + set2Name + "=" + set2Result);
+        if (printChances)
+            System.out.println("Learning | " + set1Name + "=" + set1Result + " " + set2Name + "=" + set2Result);
         return set1Result > set2Result ? set1Name : set2Name;
     }
 }

@@ -22,6 +22,21 @@ public class InputReader {
     }
 
     /**
+     * Lazy implementation for reading in files.
+     * Beware that the contents of the file must fit in the max allocation size of a byte array.
+     *
+     * @param path     location to the file
+     * @param encoding encoding
+     * @return string containing file contents
+     * @throws IOException
+     */
+    private static String readFile(String path, Charset encoding)
+            throws IOException {
+        byte[] encoded = Files.readAllBytes(Paths.get(path));
+        return new String(encoded, encoding);
+    }
+
+    /**
      * Helper method to retrieve all the file locations under the specified folder
      *
      * @param folder path to folder
@@ -57,20 +72,5 @@ public class InputReader {
                 e.printStackTrace();
             }
         return returnList;
-    }
-
-    /**
-     * Lazy implementation for reading in files.
-     * Beware that the contents of the file must fit in the max allocation size of a byte array.
-     *
-     * @param path     location to the file
-     * @param encoding encoding
-     * @return string containing file contents
-     * @throws IOException
-     */
-    private static String readFile(String path, Charset encoding)
-            throws IOException {
-        byte[] encoded = Files.readAllBytes(Paths.get(path));
-        return new String(encoded, encoding);
     }
 }

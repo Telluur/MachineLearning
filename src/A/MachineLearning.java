@@ -114,8 +114,4 @@ public class MachineLearning {
         System.out.println("Accuracy: " + (set1Hits + set2Hits) + "/" + (set1Size + set2Size) + " correct predictions.("
                 + String.format("%.02f", (float) (((set1Hits + set2Hits) * 100f) / (set1Size + set2Size))) + "%)");
     }
-
-    public static void main(String args[]) {
-        new MachineLearning();
-    }
 }

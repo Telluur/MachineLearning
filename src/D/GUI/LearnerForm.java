@@ -7,7 +7,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class LearnerForm extends JFrame implements ActionListener{
+public class LearnerForm extends JFrame implements ActionListener {
     private JPanel mainView;
     private JTextArea displayTextArea;
     private JTextArea displayInformationArea;
@@ -37,7 +37,7 @@ public class LearnerForm extends JFrame implements ActionListener{
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource().equals(showInteractiveLearnerButton)){
+        if (e.getSource().equals(showInteractiveLearnerButton)) {
             set1Button.setEnabled(false);
             set2Button.setEnabled(false);
             showInteractiveLearnerButton.setEnabled(false);
@@ -48,31 +48,31 @@ public class LearnerForm extends JFrame implements ActionListener{
                     controller.showLearner();
                 }
             });
-        }else if(e.getSource().equals(set1Button)){
+        } else if (e.getSource().equals(set1Button)) {
             setBusy();
             controller.selectSet1();
-        }else if(e.getSource().equals(set2Button)){
+        } else if (e.getSource().equals(set2Button)) {
             setBusy();
             controller.selectSet2();
         }
     }
 
-    public void updateScreen(String text, String staticPrediction, String learningPrediction, String actualSet) {
+    public void updateScreen(String text, String staticPrediction, String learningPrediction, String actualSet, boolean enableLearner) {
         displayTextArea.setText(text);
         displayInformationArea.setText("Static Prediction: " + staticPrediction + "\nLearning Prediction: " + learningPrediction + "\nActual: " + actualSet);
         set1Button.setEnabled(true);
         set2Button.setEnabled(true);
-        showInteractiveLearnerButton.setEnabled(true);
+        if (enableLearner) showInteractiveLearnerButton.setEnabled(true);
     }
 
-    public void setBusy(){
+    public void setBusy() {
         displayInformationArea.setText("Busy predicting next message...");
         set1Button.setEnabled(false);
         set2Button.setEnabled(false);
         showInteractiveLearnerButton.setEnabled(false);
     }
 
-    public void setDone(){
+    public void setDone() {
         displayInformationArea.setText("No more messages available");
         displayTextArea.setText("");
         set1Button.setEnabled(false);
