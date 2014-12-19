@@ -35,8 +35,8 @@ public class GUIController {
         if (set.equals(Set.HAM_SPAM)) {
             List<String> ham = inputReader.generateAndPopulateList(new File(InputReader.EMAIL_LOC + "\\ham"));
             List<String> spam = inputReader.generateAndPopulateList(new File(InputReader.EMAIL_LOC + "\\spam"));
-            int trainingHam = (int) (ham.size() * 90 / 100f);
-            int trainingSpam = (int) (spam.size() * 90 / 100f);
+            int trainingHam = (int) (ham.size() * 55 / 100f);
+            int trainingSpam = (int) (spam.size() * 55 / 100f);
             set1Train = Util.tokenizeStringList(ham.subList(0, trainingHam));
             set2Train = Util.tokenizeStringList(spam.subList(0, trainingSpam));
             set1Test = ham.subList(trainingHam, ham.size());
@@ -102,7 +102,16 @@ public class GUIController {
             if(resultSet == null) break; //no more entries to test.
             System.out.println(queuePosition + " " + resultSet[0] + " " + resultSet[1]);
             if(resultSet[0].equals(resultSet[1])){
-                selectSet2();
+                if(resultSet[2].equals(Set.HAM_SPAM.getSet1()) || resultSet[2].equals(Set.MALE_FEMALE.getSet1())){
+                    Util.addToWordValuesDictionary(learnerDictionary, Util.tokenizeString(queue.get(queuePosition)[0]), null);
+                }else if(resultSet[2].equals(Set.HAM_SPAM.getSet2()) || resultSet[2].equals(Set.MALE_FEMALE.getSet2())){
+                    Util.addToWordValuesDictionary(learnerDictionary, null, Util.tokenizeString(queue.get(queuePosition)[0]));
+                }else{
+                    System.out.println("Something went wrong.....");
+                    break; //should never happen
+                }
+
+
             }else{
                 determineMessage(queuePosition, true);
                 break; //Difference between static and learner found.
