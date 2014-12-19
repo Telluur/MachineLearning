@@ -10,7 +10,7 @@ import java.util.Map;
 public class MachineLearning {
     public static final float SMOOTHING = 1;
     public static final float BLOG_SMOOTHING = 0.00001f;
-    public static final float EMAIL_SMOOTHING = 0.01f;
+    public static final float EMAIL_SMOOTHING = 0.001f;
     InputReader inputReader = new InputReader();
 
     public MachineLearning() {

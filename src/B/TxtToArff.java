@@ -47,9 +47,9 @@ public class TxtToArff {
 	public Instances trainDataUpdate;
 
 	public static void main(String[] args) throws Exception {
-		TxtToArff txttoarff = new TxtToArff();
-		Instances train = txttoarff.createArrf(trainPath);
-		txttoarff.writeARFF(train, "trainearly.arff");
+//		TxtToArff txttoarff = new TxtToArff();
+//		Instances train = txttoarff.createArrf(trainPath);
+//		txttoarff.writeARFF(train, "trainearly.arff");
 //		Instances test = txttoarff.createArrf(testPath);
 //		StringToWordVector stw = txttoarff.createSTW(train);
 //		train = txttoarff.filterData(train, stw);
